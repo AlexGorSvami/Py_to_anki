@@ -1,6 +1,6 @@
 import logging 
 import time 
-from src.api_client import GeminiClient 
+from src.api_client import DeepSeekClient 
 from src.file_handler import save_to_csv 
 
 # Logging settings
@@ -29,7 +29,7 @@ def main():
 
     logger.info(f'Begin processing {len(chunks)} blocks...')
     
-    client = GeminiClient()
+    client = DeepSeekClient()
 
     #Processing cycle
     for i, chunk in enumerate(chunks, 1):
