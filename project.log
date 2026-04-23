@@ -473,3 +473,17 @@
 2026-04-23 20:50:52,812 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
 2026-04-23 20:50:57,550 [INFO] [+] Block 63/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
 2026-04-23 20:51:02,998 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:51:20,241 [INFO] [+] Block 64/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:51:25,693 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:51:32,643 [INFO] [+] Block 65/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:51:38,102 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:51:42,688 [INFO] [+] Block 66/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:51:48,126 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:52:02,452 [INFO] [+] Block 67/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:52:07,891 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:52:18,498 [INFO] [+] Block 68/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:52:23,934 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:52:30,485 [INFO] [+] Block 69/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:52:35,932 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:52:41,215 [INFO] [+] Block 70/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:52:46,669 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
