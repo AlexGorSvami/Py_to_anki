@@ -487,3 +487,20 @@
 2026-04-23 20:52:35,932 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
 2026-04-23 20:52:41,215 [INFO] [+] Block 70/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
 2026-04-23 20:52:46,669 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:52:56,543 [INFO] [+] Block 71/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:53:01,985 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 500 Internal Server Error"
+2026-04-23 20:53:01,986 [INFO] Retrying request to /chat/completions in 0.387905 seconds
+2026-04-23 20:53:02,698 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 500 Internal Server Error"
+2026-04-23 20:53:02,699 [INFO] Retrying request to /chat/completions in 0.948358 seconds
+2026-04-23 20:53:03,918 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-04-23 20:53:03,919 [ERROR] DeepSeek Error: Error code: 503 - {'error': {'message': 'Service is too busy. We advise users to temporarily switch to alternative LLM API service providers.', 'type': 'service_unavailable_error', 'param': None, 'code': 'service_unavailable_error'}}
+2026-04-23 20:53:03,919 [ERROR] [!] Error processing block 72: Error code: 503 - {'error': {'message': 'Service is too busy. We advise users to temporarily switch to alternative LLM API service providers.', 'type': 'service_unavailable_error', 'param': None, 'code': 'service_unavailable_error'}}
+2026-04-23 20:53:03,920 [INFO] [~] Waiting 60 seconds before retry...
+2026-04-23 20:54:04,360 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:54:11,924 [INFO] [+] Block 73/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:54:17,368 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:54:25,223 [INFO] [+] Block 74/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:54:30,689 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:54:38,156 [INFO] [+] Block 75/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
+2026-04-23 20:54:43,853 [INFO] HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-04-23 20:54:45,316 [INFO] [+] Block 76/76 processed and saved to Computer_Science_Всё_что_нуджно_знать.csv.
