@@ -104,6 +104,7 @@ PyJWT==2.12.1
 PyMuPDF==1.27.2.2
 pyparsing==3.3.2
 pypdf==6.10.2
+PyPDF2==3.0.1
 pytesseract==0.3.13
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.2

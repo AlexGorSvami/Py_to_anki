@@ -1,7 +1,13 @@
 import os  
+import logging 
 from ebooklib import epub, ITEM_DOCUMENT 
 from bs4 import BeautifulSoup 
 from pypdf import PdfReader  
+import pytesseract 
+from pdf2image import convert_from_path 
+
+logger = logging.getLogger(__name__)
+
 def read_txt(path):
     with open(path, 'r', encoding='utf-8') as f:
         return f.read()
@@ -40,7 +46,21 @@ def read_pdf(path):
             text = page.extract_text()
             if text:
                 text_blocks.append(text)
-    return '\n'.join(text_blocks)
+    
+    extracted_text = '\n'.join(text_blocks)
+    #If the text less 50 symbols start OCR 
+    if len(extracted_text.strip()) < 50:
+        logger.info('Text layer not found. Start OCR')
+        images = convert_from_path(path)
+
+        ocr_text = []
+        for img in images:
+            ocr_text.append(pytesseract.image_to_string(img, lang='eng+rus'))
+        extracted_text = '\n'.join(ocr_text)
+
+    return extracted_text 
+
+    
 
 def extract_text(path):
     #Entry point for reading files 
