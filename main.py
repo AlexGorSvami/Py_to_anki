@@ -1,5 +1,5 @@
 import logging 
-import time
+import asyncio 
 import os
 import json
 from src.file_reader import extract_text 

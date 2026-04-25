@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-from openai import OpenAI
+from openai import AsyncOpenAI 
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,14 +11,14 @@ class DeepSeekClient:
     def __init__(self):
         self.api_key = os.getenv("DEEPSEEK_API_KEY")
         # DeepSeek использует базовый URL для совместимости с OpenAI
-        self.client = OpenAI(
+        self.client = AsyncOpenAI(
             api_key=self.api_key, 
             base_url="https://api.deepseek.com"
         )
         # Основная модель для чата и кодинга
         self.model_id = "deepseek-chat" 
 
-    def generate_cards(self, text):
+    async def generate_cards(self, text):
         prompt = f"""
         Составь Anki-карточки (вопрос;ответ) по тексту Python.
         Верни ТОЛЬКО чистый JSON список объектов [{{ "question": "...", "answer": "..." }}].
@@ -26,7 +26,7 @@ class DeepSeekClient:
         """
         
         try:
-            response = self.client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 model=self.model_id,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant that outputs only JSON."},
@@ -49,4 +49,5 @@ class DeepSeekClient:
             
         except Exception as e:
             logger.error(f"DeepSeek Error: {e}")
-            raise e
+            raise e 
+
