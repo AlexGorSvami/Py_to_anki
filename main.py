@@ -5,6 +5,7 @@ import logging
 from src.file_reader import extract_text 
 from src.api_client import DeepSeekClient 
 from src.file_handler import save_to_csv 
+from tqdm.asyncio import tqdm 
 
 # Настройка логирования
 logging.basicConfig(
@@ -17,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-async def process_chunk(client, chunk, i, total, output_file, cache_file, processed_ind, sem):
+async def process_chunk(client, chunk, i, total, output_file, cache_file, processed_ind, sem, lock):
     """Асинхронная обработка одного куска текста"""
     async with sem:
         if i in processed_ind:
@@ -30,15 +31,16 @@ async def process_chunk(client, chunk, i, total, output_file, cache_file, proces
             
             if cards:
                 # Отправляем быструю синхронную запись в отдельный поток, чтобы не блокировать цикл
-                await asyncio.to_thread(save_to_csv, cards, output_file) 
-                logger.info(f'[+] Block {i}/{total} processed and saved to {output_file}.')
-                
-                # Обновляем кэш
-                processed_ind.append(i)
-                # Быстрая файловая операция, можно оставить синхронной
-                with open(cache_file, 'w') as f:
-                    json.dump(processed_ind, f)
+                async with lock:
+                    await asyncio.to_thread(save_to_csv, cards, output_file) 
+                    logger.info(f'[+] Block {i}/{total} processed and saved to {output_file}.')
                     
+                    # Обновляем кэш
+                    processed_ind.append(i)
+                    # Быстрая файловая операция, можно оставить синхронной
+                    with open(cache_file, 'w') as f:
+                        json.dump(processed_ind, f)
+                        
             # Небольшая пауза, чтобы не спамить API одновременно сотней запросов
             await asyncio.sleep(1) 
             
@@ -48,12 +50,11 @@ async def process_chunk(client, chunk, i, total, output_file, cache_file, proces
 async def main_async():
     path = input('Please, enter the book path: ').strip()
     user_filename = input('Enter output filename (Enter for auto-naming): ').strip()
-    
+    base_name = os.path.splitext(os.path.basename(path))[0]
+     
     if not user_filename:
-        base_name = os.path.splitext(os.path.basename(path))[0]
-        output_file = f"{base_name}.csv"
+       output_file = f"{base_name}.csv"
     else:
-        base_name = os.path.splitext(os.path.basename(path))[0]
         output_file = user_filename if user_filename.endswith('.csv') else f"{user_filename}.csv"
         
     cache_file = f'{base_name}_progress.json'
@@ -81,15 +82,16 @@ async def main_async():
     # Семафор ограничивает количество ОДНОВРЕМЕННЫХ запросов к API. 
     # Ставим 5, чтобы не нарваться на ошибку 429 (Rate Limit).
     sem = asyncio.Semaphore(5)
+    lock = asyncio.Lock() #Create blocking
     
     # Создаем список задач
     tasks = []
     for i, chunk in enumerate(chunks, 1):
-        task = process_chunk(client, chunk, i, len(chunks), output_file, cache_file, processed_ind, sem)
+        task = process_chunk(client, chunk, i, len(chunks), output_file, cache_file, processed_ind, sem, lock)
         tasks.append(task)
         
     # Запускаем все задачи параллельно
-    await asyncio.gather(*tasks)
+    await tqdm.gather(*tasks, desc='Обработка блоков')
 
 if __name__ == '__main__':
     # Точка входа в асинхронную программу

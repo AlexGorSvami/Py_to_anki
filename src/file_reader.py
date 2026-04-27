@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from pypdf import PdfReader  
 import pytesseract 
 from pdf2image import convert_from_path 
+from tqdm import tqdm   
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +16,9 @@ def read_txt(path):
 def read_epub(path):
     book = epub.read_epub(path)
     text_blocks = []
-
+    items = list(book.get_items())
     # Go trough all book elements
-    for item in book.get_items():
+    for item in tqdm(items, desc='Чтение EPUB'):
         # We need only text documents (HTML inside EPUB)
         if item.get_type() == ITEM_DOCUMENT:
             #BeautifulSoup clearing text from HTML-tags 
@@ -32,7 +33,8 @@ def read_fb2(path):
 
         #The main text in Fb2 stored in <p> and <v> tags 
         text_blocks = []
-        for i in soup.find_all(['p', 'v']):
+        elements = soup.find_all(['p', 'v'])
+        for i in tqdm(elements, desc='Чтение FB2'):
             text_blocks.append(i.get_text(strip=True))
 
         return '\n'.join(text_blocks)
@@ -42,7 +44,7 @@ def read_pdf(path):
     # Reading file in rb format 
     with open(path, 'rb') as f:
         reader = PdfReader(f)
-        for page in reader.pages:
+        for page in tqdm(reader.pages, desc='Чтение PDF (text)'):
             text = page.extract_text()
             if text:
                 text_blocks.append(text)
@@ -54,7 +56,7 @@ def read_pdf(path):
         images = convert_from_path(path)
 
         ocr_text = []
-        for img in images:
+        for img in tqdm(images, desc='OCR: Распознавание страниц'):
             ocr_text.append(pytesseract.image_to_string(img, lang='eng+rus'))
         extracted_text = '\n'.join(ocr_text)
 
