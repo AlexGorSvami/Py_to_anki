@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+from tenacity import retry, stop_after_attempt, wait_exponential 
 from openai import AsyncOpenAI 
 from dotenv import load_dotenv
 
@@ -18,6 +19,11 @@ class DeepSeekClient:
         # Основная модель для чата и кодинга
         self.model_id = "deepseek-chat" 
 
+    @retry(
+            stop=stop_after_attempt(5),
+            wait=wait_exponential(multiplier=1, min=2, max=60),
+            reraise=True
+            )
     async def generate_cards(self, text):
         prompt = f"""
         Составь Anki-карточки (вопрос;ответ) по тексту Python.
