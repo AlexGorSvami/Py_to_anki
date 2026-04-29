@@ -2,10 +2,12 @@ import asyncio
 import os
 import json
 import logging
+from tqdm.asyncio import tqdm
+
 from src.file_reader import extract_text 
 from src.api_client import DeepSeekClient 
 from src.file_handler import save_to_csv 
-from tqdm.asyncio import tqdm 
+from src.anki_exporter import export_to_apkg 
 
 # Настройка логирования
 logging.basicConfig(
@@ -19,37 +21,44 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 async def process_chunk(client, chunk, i, total, output_file, cache_file, processed_ind, sem, lock):
-    """Асинхронная обработка одного куска текста"""
+    """Асинхронная обработка одного куска текста с возвратом результата"""
     async with sem:
+        # Если блок уже обработан, возвращаем пустой список
         if i in processed_ind:
             logger.info(f'[-] Block {i}/{total} skipped (cached)')
-            return 
+            return [] 
             
         try:
             # Асинхронно ждем ответ от API
             cards = await client.generate_cards(chunk)
             
             if cards:
-                # Отправляем быструю синхронную запись в отдельный поток, чтобы не блокировать цикл
+                # Синхронная запись в CSV через поток (thread) для безопасности
                 async with lock:
                     await asyncio.to_thread(save_to_csv, cards, output_file) 
-                    logger.info(f'[+] Block {i}/{total} processed and saved to {output_file}.')
                     
                     # Обновляем кэш
                     processed_ind.append(i)
-                    # Быстрая файловая операция, можно оставить синхронной
                     with open(cache_file, 'w') as f:
                         json.dump(processed_ind, f)
-                        
-            # Небольшая пауза, чтобы не спамить API одновременно сотней запросов
-            await asyncio.sleep(1) 
-            
+                
+                logger.info(f'[+] Block {i}/{total} processed and saved to {output_file}.')
+                
+                # Небольшая пауза, чтобы соблюдать лимиты API
+                await asyncio.sleep(1) 
+                
+                # ВАЖНО: возвращаем список карточек для дальнейшей упаковки в .apkg
+                return cards
+                
         except Exception as err:
             logger.error(f'[!] Error processing block {i}: {err}')
+            
+    # Если карточек нет или произошла ошибка, возвращаем пустой список
+    return []
 
 async def main_async():
     path = input('Please, enter the book path: ').strip()
-    user_filename = input('Enter output filename (Enter for auto-naming): ').strip()
+    user_filename = input('Enter output file_name(Enter for auto-naming): ').strip()
     base_name = os.path.splitext(os.path.basename(path))[0]
      
     if not user_filename:
@@ -89,10 +98,24 @@ async def main_async():
     for i, chunk in enumerate(chunks, 1):
         task = process_chunk(client, chunk, i, len(chunks), output_file, cache_file, processed_ind, sem, lock)
         tasks.append(task)
-        
-    # Запускаем все задачи параллельно
-    await tqdm.gather(*tasks, desc='Обработка блоков')
+
+    results= await tqdm.gather(*tasks, desc='Обработка блоков')
+
+    all_cards = []
+    for chunk_result in results:
+        if chunk_result:
+            all_cards.extend(chunk_result)
+
+    if all_cards:
+        anki_output = output_file.replace('.csv', '.apkg')
+        try:
+            export_to_apkg(all_cards, base_name, anki_output) 
+            logger.info(f'[#] Success! Create Anki deck: {anki_output} ({len(all_cards)} pieces.)')
+        except Exception as e:
+            logger.error(f'[!] Error while creating .apkg: {e}')
+    else:
+         logger.warning('No cards were created. Export to Anki was skipped.')
+
 
 if __name__ == '__main__':
-    # Точка входа в асинхронную программу
     asyncio.run(main_async())
